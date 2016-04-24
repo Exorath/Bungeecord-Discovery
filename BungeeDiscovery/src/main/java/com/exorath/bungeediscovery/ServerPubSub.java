@@ -8,9 +8,7 @@ import org.apache.commons.lang.Validate;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 
-import java.lang.reflect.Proxy;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 
 
@@ -37,6 +35,7 @@ public class ServerPubSub extends JedisPubSub {
                     }catch(Exception e){
                         e.printStackTrace();
                     }
+                    resource.close();
                 }, 1, Discovery.getAPI().getIntFromConfig("interval",1),
                 TimeUnit.valueOf(Discovery.getAPI().getStringFromConfig("timeunit", "SECONDS")));
     }
@@ -90,8 +89,12 @@ public class ServerPubSub extends JedisPubSub {
      * @return Singleton of this class
      */
     public static ServerPubSub getOrCreate() {
-        if (instance == null)
+        if (instance == null) {
             instance = new ServerPubSub();
+            Jedis resource = Discovery.getAPI().getRedisPool().getResource();
+            resource.subscribe(instance, SERVER_REGISTRATION_CHANNEL);
+            resource.close();
+        }
         return instance;
     }
 }

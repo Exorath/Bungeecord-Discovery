@@ -18,7 +18,7 @@ import java.net.UnknownHostException;
 public class Discovery extends Plugin implements DiscoveryAPI {
     private static Discovery instance = null;
     private Configuration configuration;
-    private JedisPool jedisPool = new JedisPool("localhost", 6379);;
+    private JedisPool jedisPool = new JedisPool("localhost", 6379);
 
     @Override
     public void onEnable() {
